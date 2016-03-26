@@ -46,16 +46,24 @@ typedef struct psync_thread_t_
 	void * user_data;
 } psync_thread_t_;
 
+// this is just to avoid casting issues between a pointer and a DWORD
+typedef union psync_thread_return_t
+{
+	void * return_value;
+	DWORD exit_code;
+} psync_thread_return_t;
+
 static DWORD WINAPI _psync_thread_entry(LPVOID psync_user_data);
 
-psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * user_data, int priority, unsigned int stack_size, char const * name)
+psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * user_data, const psync_thread_param_t * thread_param)
 {
-	HANDLE thread_handle;
-	DWORD thread_id;
-	DWORD flags;
 	psync_thread_t thread;
-
-	(void)name;
+	SYSTEM_INFO system_info;
+	HANDLE thread_handle;
+	DWORD stack_size;
+	int priority;
+	DWORD flags;
+	DWORD thread_id;
 
 	thread = (psync_thread_t)malloc(sizeof(psync_thread_t_));
 	if (thread == NULL)
@@ -63,27 +71,54 @@ psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * use
 		return NULL;
 	}
 
-	/* not needed
-	if (stack_size == 0)
+	thread->thread_entry = thread_entry;
+	thread->user_data = user_data;
+
+	if (thread_param == NULL)
 	{
 		stack_size = 0;
 	}
-	*/
+	else
+	{
+		if (thread_param->stack_size.relative < 0.0f)
+		{
+			return NULL;
+		}
+
+		GetSystemInfo(&system_info);
+		stack_size = (DWORD)(system_info.dwAllocationGranularity * thread_param->stack_size.relative) + thread_param->stack_size.absolute;
+	}
+
+	if (thread_param == NULL)
+	{
+		priority = THREAD_PRIORITY_NORMAL;
+	}
+	else
+	{
+		if ((thread_param->priority.relative < -1.0f) || (thread_param->priority.relative > 1.0f))
+		{
+			return NULL;
+		}
+
+		priority = (int)(2 * thread_param->priority.relative) + thread_param->priority.absolute;
+	}
 
 	flags = 0;
-	if (priority != PSYNC_THREAD_PRIORITY_DEFAULT)
+	if (priority != THREAD_PRIORITY_NORMAL)
 	{
         flags |= CREATE_SUSPENDED;
 	}
 
-	thread_handle = CreateThread(NULL, stack_size, _psync_thread_entry, thread, 0, &thread_id);
+	thread_handle = CreateThread(NULL, stack_size, _psync_thread_entry, thread, flags, &thread_id);
 	if (thread_handle == NULL)
 	{
 		free(thread);
 		return NULL;
 	}
 
-	if (priority != PSYNC_THREAD_PRIORITY_DEFAULT)
+	thread->thread_handle = thread_handle;
+
+	if (priority != THREAD_PRIORITY_NORMAL)
 	{
 		if ((SetThreadPriority(thread_handle, priority) != TRUE) || (ResumeThread(thread_handle) == (DWORD)-1))
 		{
@@ -94,16 +129,12 @@ psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * use
 		}
 	}
 
-	thread->thread_handle = thread_handle;
-	thread->thread_entry = thread_entry;
-	thread->user_data = user_data;
-
 	return thread;
 }
 
 void psync_thread_join(psync_thread_t thread, void ** return_value)
 {
-	DWORD exit_code;
+	psync_thread_return_t thread_return;
 
 	if (thread == NULL)
 	{
@@ -112,20 +143,20 @@ void psync_thread_join(psync_thread_t thread, void ** return_value)
 
 	do
 	{
-		if (GetExitCodeThread(thread->thread_handle, &exit_code) != TRUE)
+		if (GetExitCodeThread(thread->thread_handle, &thread_return.exit_code) != TRUE)
 		{
 			return;
 		}
 
-		if (exit_code == STILL_ACTIVE)
+		if (thread_return.exit_code == STILL_ACTIVE)
 		{
 			Sleep(1);
 		}
-	} while (exit_code == STILL_ACTIVE);
+	} while (thread_return.exit_code == STILL_ACTIVE);
 
 	if (return_value != NULL)
 	{
-		*return_value = (void *)exit_code;
+		*return_value = thread_return.return_value;
 	}
 
 	CloseHandle(thread->thread_handle);
@@ -134,17 +165,19 @@ void psync_thread_join(psync_thread_t thread, void ** return_value)
 
 void psync_thread_exit(void * return_value)
 {
-	ExitThread((DWORD)return_value);
+	psync_thread_return_t thread_return;
+	thread_return.return_value = return_value;
+	ExitThread(thread_return.exit_code);
 }
 
 DWORD WINAPI _psync_thread_entry(LPVOID psync_user_data)
 {
-	void * return_value;
+	psync_thread_return_t thread_return;
 
 	psync_thread_t thread = (psync_thread_t)psync_user_data;
-	return_value = thread->thread_entry(thread->user_data);
+	thread_return.return_value = thread->thread_entry(thread->user_data);
 
-	return (DWORD)return_value;
+	return thread_return.exit_code;
 }
 
 void psync_thread_sleep(unsigned int microseconds)
@@ -152,4 +185,3 @@ void psync_thread_sleep(unsigned int microseconds)
 	DWORD milliseconds = microseconds / 1000; // rounds down
 	Sleep(milliseconds);
 }
-

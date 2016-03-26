@@ -34,6 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "libpsync.h"
 #include <assert.h>
+#include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -144,7 +145,7 @@ static void test_thread(void)
 	printf("testing thread\n");
 
 	test_thread_counter = 0;
-	thread = psync_thread_create(test_thread_entry, (void *)&test_thread_counter, PSYNC_THREAD_PRIORITY_DEFAULT, PSYNC_THREAD_STACK_SIZE_DEFAULT, "test_thread");
+	thread = psync_thread_create(test_thread_entry, (void *)&test_thread_counter, NULL);
 	assert(thread);
 
 	psync_thread_join(thread, &return_value);
@@ -157,7 +158,13 @@ static void test_thread_cxx(void)
 	printf("testing thread c++\n");
 
 	volatile int test_thread_counter = 0;
-	psyncThread thread(test_thread_entry, (void *)&test_thread_counter, PSYNC_THREAD_PRIORITY_DEFAULT, PSYNC_THREAD_STACK_SIZE_DEFAULT, "test_thread");
+	psync_thread_param_t thread_param;
+	memset(&thread_param, 0, sizeof(thread_param));
+	thread_param.stack_size.relative = 2.0f;
+	thread_param.stack_size.absolute = 16 * 1024;
+	thread_param.priority.relative = 0.0f;
+	thread_param.name = "test_thread";
+	psyncThread thread(test_thread_entry, (void *)&test_thread_counter, &thread_param);
 	assert(thread.IsValid());
 
 	void * return_value;

@@ -37,29 +37,78 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <stdlib.h>
 
+// Cygwin seems to be missing this
+#ifndef PTHREAD_STACK_MIN
+#	define PTHREAD_STACK_MIN (64 * 1024)
+#endif
+
 typedef struct psync_thread_t_
 {
 	pthread_t pthread;
 } psync_thread_t_;
 
-psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * user_data, int priority, unsigned int stack_size, char const * name)
+psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * user_data, const psync_thread_param_t * thread_param)
 {
 	int res;
+	int priority_min;
+	int priority_max;
+	int priority_mid;
+	int priority;
+	size_t stack_size;
 	pthread_t pthread;
 	pthread_attr_t attr;
 	struct sched_param param;
 	psync_thread_t thread;
 
-	(void)name; // unused
-
-	if (priority == PSYNC_THREAD_PRIORITY_DEFAULT)
+	priority_min = sched_get_priority_min(SCHED_OTHER);
+	priority_max = sched_get_priority_max(SCHED_OTHER);
+	priority_mid = priority_min + (priority_max - priority_min + 1) / 2;
+	if ((priority_min == -1) || (priority_max == -1))
 	{
-		priority = 0; // FIX - don't hardcode this magic number
+		return NULL;
 	}
 
-	if (stack_size == 0)
+	if (thread_param == NULL)
 	{
-		stack_size = 0x4000; // FIX - don't hardcode this magic number
+		priority = priority_mid;
+	}
+	else
+	{
+		if ((thread_param->priority.relative < -1.0f) || (thread_param->priority.relative > 1.0f))
+		{
+			return NULL;
+		}
+
+		priority = priority_min + (int)((priority_max - priority_min + 1) * ((1.0f + thread_param->priority.relative) / 2.0f)) + thread_param->priority.absolute;
+
+		if (priority_min < priority_max)
+		{
+			if ((priority < priority_min) || (priority > priority_max))
+			{
+				return NULL;
+			}
+		}
+		else
+		{
+			if ((priority < priority_max) || (priority > priority_min))
+			{
+				return NULL;
+			}
+		}
+	}
+
+	if (thread_param == NULL)
+	{
+		stack_size = 0;
+	}
+	else
+	{
+		if (thread_param->stack_size.relative < 0.0f)
+		{
+			return NULL;
+		}
+
+		stack_size = (PTHREAD_STACK_MIN * thread_param->stack_size.relative) + thread_param->stack_size.absolute;
 	}
 
 	res = pthread_attr_init(&attr);

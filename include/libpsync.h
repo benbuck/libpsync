@@ -75,13 +75,23 @@ psync_bool_t psync_semaphore_try(psync_semaphore_t semaphore);
 
 /** Thread **/
 
-#define PSYNC_THREAD_PRIORITY_DEFAULT (1 << ((sizeof(int) * 8) - 1))
-#define PSYNC_THREAD_STACK_SIZE_DEFAULT 0
-
 typedef struct psync_thread_t_ * psync_thread_t;
 typedef void * (* psync_thread_entry_t)(void * user_data);
 
-psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * user_data, int priority, unsigned int stack_size, char const * name);
+typedef struct psync_unified_param_t
+{
+	float relative;
+	int absolute;
+} psync_unified_param_t;
+
+typedef struct psync_thread_param_t
+{
+	psync_unified_param_t priority;
+	psync_unified_param_t stack_size;
+	char const * name;
+} psync_thread_param_t;
+
+psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * user_data, const psync_thread_param_t * thread_param);
 void psync_thread_join(psync_thread_t thread, void ** return_value);
 void psync_thread_exit(void * return_value);
 void psync_thread_sleep(unsigned int microseconds);
@@ -108,6 +118,12 @@ public:
 
 	psyncMutex(psyncMutex & mutex) :
 		mMutex(mutex.mMutex),
+		mOwner(false)
+	{
+	}
+
+	psyncMutex(psync_mutex_t mutex) :
+		mMutex(mutex),
 		mOwner(false)
 	{
 	}
@@ -152,6 +168,12 @@ class psyncMutexAuto
 public:
 	psyncMutexAuto(psyncMutex & mutex) :
 		mMutex(mutex.mMutex),
+		mObtained(psync_mutex_obtain(mMutex) == psync_bool_true)
+	{
+	}
+
+	psyncMutexAuto(psync_mutex_t mutex) :
+		mMutex(mutex),
 		mObtained(psync_mutex_obtain(mMutex) == psync_bool_true)
 	{
 	}
@@ -235,8 +257,8 @@ protected:
 class psyncThread
 {
 public:
-	psyncThread(psync_thread_entry_t thread_entry, void * user_data, int priority, unsigned int stack_size, char const * name) :
-		mThread(psync_thread_create(thread_entry, user_data, priority, stack_size, name))
+	psyncThread(psync_thread_entry_t thread_entry, void * user_data, const psync_thread_param_t * thread_param) :
+		mThread(psync_thread_create(thread_entry, user_data, thread_param))
 	{
 	}
 

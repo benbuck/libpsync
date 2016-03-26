@@ -13,7 +13,6 @@ code please read LICENSE.TXT (which is a standard new BSD license).
 To Do
 -----
 
-* Fix warnings related to casting thread user data pointer.
 * Add more features to existing APIs.
 * Add build files (make? automake? CMake? Visual Studio? Visual SlickEdit? ...)
 * Add more synchronization primitives (conditionals, events, etc.)
@@ -25,6 +24,12 @@ To Do
 
 Revision History
 ----------------
+
+0.4 (2007-09-29)
+* Fix warnings related to casting thread user data pointer and return values.
+* Improved thread creation API.
+* Rewrote thread priority and stack size code.
+* Added additional constructor to mutex classes.
 
 0.3 (2007-09-24)
 * Fixed bug in threading test.

@@ -36,6 +36,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <pthread.h>
 #include <malloc.h>
 
+#ifndef PTHREAD_MUTEX_RECURSIVE
+#define PTHREAD_MUTEX_RECURSIVE PTHREAD_MUTEX_RECURSIVE_NP
+#endif
+
 typedef struct psync_mutex_t_
 {
 	pthread_mutex_t pthread_mutex;
@@ -61,7 +65,6 @@ psync_mutex_t psync_mutex_create(void)
 		return NULL;
 	}
 
-	// FIX - set attr name
 	res = pthread_mutex_init(&pthread_mutex, &attr);
 	pthread_mutexattr_destroy(&attr);
 	if (res != 0)
