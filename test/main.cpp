@@ -37,6 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 static void test_mutex(void);
 static void test_mutex_cxx(void);
@@ -138,6 +139,7 @@ void test_semaphore_cxx(void)
 
 static void test_thread(void)
 {
+	psync_bool_t res;
 	psync_thread_t thread;
 	void * return_value;
 	volatile int test_thread_counter;
@@ -148,7 +150,8 @@ static void test_thread(void)
 	thread = psync_thread_create(test_thread_entry, (void *)&test_thread_counter, NULL);
 	assert(thread);
 
-	psync_thread_join(thread, &return_value);
+	res = psync_thread_join(thread, &return_value);
+	assert(res);
 	assert(test_thread_counter == 1);
 	assert(return_value == (void *)&test_thread_counter);
 }

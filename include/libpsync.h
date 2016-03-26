@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
-/** libpsync - threading and syncronization primitives **/
+/*** libpsync - portable threading and syncronization primitives. ***/
 
 #ifndef _libpsync_h_
 #define _libpsync_h_
@@ -41,10 +41,11 @@ POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif /* __cplusplus */
 
-/** C interface **/
+/*** C interface ***/
 
-/** Common **/
+/*** Common ***/
 
+/** Boolean type. **/
 typedef enum psync_bool_t
 {
 	psync_bool_false,
@@ -52,38 +53,53 @@ typedef enum psync_bool_t
 } psync_bool_t;
 
 
-/** Mutex **/
+/*** Mutex ***/
 
+/** Opaque mutex handle. **/
 typedef struct psync_mutex_t_ * psync_mutex_t;
 
+/** Create a mutex.**/
 psync_mutex_t psync_mutex_create(void);
+/** Destroy a mutex. **/
 void psync_mutex_destroy(psync_mutex_t mutex);
+/** Obtain (lock) a mutex. **/
 psync_bool_t psync_mutex_obtain(psync_mutex_t mutex);
+/** Release (unlock) a mutex. **/
 void psync_mutex_release(psync_mutex_t mutex);
+/** Try to obtain a mutex. **/
 psync_bool_t psync_mutex_try(psync_mutex_t mutex);
 
 
-/** Semaphore **/
+/*** Semaphore ***/
 
+/** Opaque semaphore handle. **/
 typedef struct psync_semaphore_t_ * psync_semaphore_t;
 
+/** Create a semaphore.**/
 psync_semaphore_t psync_semaphore_create(int initial_count, int max_count);
+/** Destroy a semaphore. **/
 void psync_semaphore_destroy(psync_semaphore_t semaphore);
+/** Signal a semaphore. **/
 psync_bool_t psync_semaphore_signal(psync_semaphore_t semaphore);
+/** Wait for a semaphore to be signalled. **/
 psync_bool_t psync_semaphore_wait(psync_semaphore_t semaphore);
+/** Try to see if a semaphore is signalled. **/
 psync_bool_t psync_semaphore_try(psync_semaphore_t semaphore);
 
-/** Thread **/
 
+/*** Thread ***/
+
+/** Opaque thread handle. **/
 typedef struct psync_thread_t_ * psync_thread_t;
+/** Thread entry point function pointer type. **/
 typedef void * (* psync_thread_entry_t)(void * user_data);
-
+/** "Unified" individual thread configuration parameter type. **/
 typedef struct psync_unified_param_t
 {
 	float relative;
 	int absolute;
 } psync_unified_param_t;
-
+/** Thread configuration parameters structure. **/
 typedef struct psync_thread_param_t
 {
 	psync_unified_param_t priority;
@@ -91,19 +107,25 @@ typedef struct psync_thread_param_t
 	char const * name;
 } psync_thread_param_t;
 
+/** Create a thread. **/
 psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * user_data, const psync_thread_param_t * thread_param);
-void psync_thread_join(psync_thread_t thread, void ** return_value);
+/** Wait for a thread to finish. **/
+psync_bool_t psync_thread_join(psync_thread_t thread, void ** return_value);
+/** Exit the current thread. **/
 void psync_thread_exit(void * return_value);
+/** Sleep the current thread. **/
 void psync_thread_sleep(unsigned int microseconds);
 
 #ifdef __cplusplus
 } /* end extern "C" */
 
-/** C++ wrappers **/
+
+/*** C++ wrappers ***/
 
 #include <cstddef>
 
-/** Mutex **/
+
+/*** Mutex ***/
 
 class psyncMutex
 {
@@ -161,7 +183,8 @@ protected:
 	bool mOwner;
 };
 
-/** Mutex **/
+
+/*** Mutex ***/
 
 class psyncMutexAuto
 {
@@ -192,14 +215,15 @@ public:
 	}
 
 protected:
-	// default construction not allowed
+	/* default construction not allowed */
 	psyncMutexAuto(void) : mMutex(NULL), mObtained(false) { }
 
 	psync_mutex_t mMutex;
 	bool mObtained;
 };
 
-/** Semaphore **/
+
+/*** Semaphore ***/
 
 class psyncSemaphore
 {
@@ -245,14 +269,15 @@ public:
 	}
 
 protected:
-	// default construction not allowed
+	/* default construction not allowed */
 	psyncSemaphore(void) : mSemaphore(NULL), mOwner(false) { }
 
 	psync_semaphore_t mSemaphore;
 	bool mOwner;
 };
 
-/** Thread **/
+
+/*** Thread ***/
 
 class psyncThread
 {
@@ -272,13 +297,13 @@ public:
 		return mThread != NULL;
 	}
 
-	void Join(void ** return_value)
+	bool Join(void ** return_value)
 	{
-		psync_thread_join(mThread, return_value);
+		return psync_thread_join(mThread, return_value) == psync_bool_true;
 	}
 
 protected:
-	// default construction not allowed
+	/* default construction not allowed */
 	psyncThread(void) : mThread(NULL) { }
 
 	psync_thread_t mThread;

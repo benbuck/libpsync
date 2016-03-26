@@ -37,7 +37,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <unistd.h>
 #include <stdlib.h>
 
-// Cygwin seems to be missing this
+/* Cygwin seems to be missing this */
 #ifndef PTHREAD_STACK_MIN
 #	define PTHREAD_STACK_MIN (64 * 1024)
 #endif
@@ -151,15 +151,24 @@ psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * use
 	return thread;
 }
 
-void psync_thread_join(psync_thread_t thread, void ** return_value)
+psync_bool_t psync_thread_join(psync_thread_t thread, void ** return_value)
 {
+	int res;
+
 	if (thread == NULL)
 	{
-		return;
+		return psync_bool_false;
 	}
 
-	pthread_join(thread->pthread, return_value);
+	res = pthread_join(thread->pthread, return_value);
+	if (res != 0)
+	{
+		return psync_bool_false;
+	}
+
 	free(thread);
+
+	return psync_bool_true;
 }
 
 void psync_thread_exit(void * return_value)

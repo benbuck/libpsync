@@ -46,7 +46,7 @@ typedef struct psync_thread_t_
 	void * user_data;
 } psync_thread_t_;
 
-// this is just to avoid casting issues between a pointer and a DWORD
+/* this is just to avoid casting issues between a pointer and a DWORD */
 typedef union psync_thread_return_t
 {
 	void * return_value;
@@ -132,20 +132,22 @@ psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * use
 	return thread;
 }
 
-void psync_thread_join(psync_thread_t thread, void ** return_value)
+psync_bool_t psync_thread_join(psync_thread_t thread, void ** return_value)
 {
+	BOOL res;
+
 	psync_thread_return_t thread_return;
 
 	if (thread == NULL)
 	{
-		return;
+		return psync_bool_false;
 	}
 
 	do
 	{
 		if (GetExitCodeThread(thread->thread_handle, &thread_return.exit_code) != TRUE)
 		{
-			return;
+			return psync_bool_false;
 		}
 
 		if (thread_return.exit_code == STILL_ACTIVE)
@@ -159,8 +161,15 @@ void psync_thread_join(psync_thread_t thread, void ** return_value)
 		*return_value = thread_return.return_value;
 	}
 
-	CloseHandle(thread->thread_handle);
+	res = CloseHandle(thread->thread_handle);
+	if (!res)
+	{
+		return psync_bool_false;
+	}
+
 	free(thread);
+
+	return psync_bool_true;
 }
 
 void psync_thread_exit(void * return_value)
@@ -182,6 +191,6 @@ DWORD WINAPI _psync_thread_entry(LPVOID psync_user_data)
 
 void psync_thread_sleep(unsigned int microseconds)
 {
-	DWORD milliseconds = microseconds / 1000; // rounds down
+	DWORD milliseconds = microseconds / 1000; /* rounds down */
 	Sleep(milliseconds);
 }

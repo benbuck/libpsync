@@ -1,0 +1,80 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libpsync", "libpsync.vcproj", "{1F115DD6-622F-421F-8F42-0066A897FB2D}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cmake", "cmake", "{CE4FC235-A834-4CFB-ABCE-34364A96F3A1}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		..\cmake\CMakeLists.txt = ..\cmake\CMakeLists.txt
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "make", "make", "{6121FC43-2E2E-469C-9EF9-AC8569D869A8}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		..\make\defs.mk = ..\make\defs.mk
+		..\make\Makefile = ..\make\Makefile
+		..\make\targets.mk = ..\make\targets.mk
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{69F4301F-F337-4CD5-BFAC-9C9F1AFB1F22}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		..\doxygen\Doxyfile = ..\doxygen\Doxyfile
+		..\LICENSE.TXT = ..\LICENSE.TXT
+		..\make_release.sh = ..\make_release.sh
+		..\README.TXT = ..\README.TXT
+		..\update_web.sh = ..\update_web.sh
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "test", "test.vcproj", "{26249C63-7D53-4E7D-92B2-E21214C3E3D4}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+	ProjectSection(ProjectDependencies) = postProject
+		{1F115DD6-622F-421F-8F42-0066A897FB2D} = {1F115DD6-622F-421F-8F42-0066A897FB2D}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "web", "web.vcproj", "{F410E419-E0A5-4C66-BB2D-64450300228D}"
+	ProjectSection(WebsiteProperties) = preProject
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.Debug = "False"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1F115DD6-622F-421F-8F42-0066A897FB2D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1F115DD6-622F-421F-8F42-0066A897FB2D}.Debug|Win32.Build.0 = Debug|Win32
+		{1F115DD6-622F-421F-8F42-0066A897FB2D}.Release|Win32.ActiveCfg = Release|Win32
+		{1F115DD6-622F-421F-8F42-0066A897FB2D}.Release|Win32.Build.0 = Release|Win32
+		{26249C63-7D53-4E7D-92B2-E21214C3E3D4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{26249C63-7D53-4E7D-92B2-E21214C3E3D4}.Debug|Win32.Build.0 = Debug|Win32
+		{26249C63-7D53-4E7D-92B2-E21214C3E3D4}.Release|Win32.ActiveCfg = Release|Win32
+		{26249C63-7D53-4E7D-92B2-E21214C3E3D4}.Release|Win32.Build.0 = Release|Win32
+		{F410E419-E0A5-4C66-BB2D-64450300228D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F410E419-E0A5-4C66-BB2D-64450300228D}.Debug|Win32.Build.0 = Debug|Win32
+		{F410E419-E0A5-4C66-BB2D-64450300228D}.Release|Win32.ActiveCfg = Release|Win32
+		{F410E419-E0A5-4C66-BB2D-64450300228D}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

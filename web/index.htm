@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd" >
+
+<html xmlns="http://www.w3.org/1999/xhtml" >
+
+	<head>
+		<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+	
+		<title>libpsync</title>
+		
+		<style type="text/css">
+			h1, h2
+			{ 
+				border: thin solid gray;
+				background-color: rgb(180, 210, 250);
+				padding: 0.3%;
+				font-family: sans-serif;
+			}
+			
+			h1
+			{ 
+				font-size: 125%;
+			}
+			
+			h2
+			{ 
+				font-size: 115%;
+			}
+			
+			div.rev
+			{
+				margin: 1%;
+				border: 1px solid gray;
+				background-color: whitesmoke;
+			}
+			
+			h3.rev
+			{ 
+				background-color: rgb(200, 230, 255);
+				padding: 0.2%;
+				margin: 1%;
+				font-size: 105%;
+				font-family: sans-serif;
+			}
+			
+			ul.rev
+			{
+				padding-top: 0;
+				padding-bottom: 0;
+				margin-top: 1%;
+				margin-bottom: 1%;
+			}
+			
+		</style>        
+		
+	</head>
+	
+	<body>
+
+		<h1>libpsync</h1>
+			<p>
+				The libpsync library provides lightweight portable
+				synchronization primitives(thread, mutex, semaphore, etc.) for
+				C/C++ under a non-restrictive license.
+			</p>
+			<p>
+				This is an open source library, for more information on the
+				licensing of the code please read LICENSE.TXT (which is a
+				standard new BSD license).
+			</p>
+
+			<p><a href="http://sourceforge.net/projects/libpsync/">SourceForge project page</a></p>
+			<p><a href="http://sourceforge.net/project/showfiles.php?group_id=206142">SourceForge download page</a></p>
+
+		<h2>To Do</h2>
+		
+		    <p>For version 1.0:</p>
+			<ul>
+				<li>Add build files (make? automake? CMake? Visual Studio? Visual SlickEdit? ...)</li>
+				<li>Add documentation.</li>
+				<li>Review return value handling</li>
+			</ul>
+			
+		    <p>Post 1.0:</p>
+			<ul>
+				<li>Add more features to existing APIs.</li>
+				<li>Add more synchronization primitives (conditionals, events, etc.)</li>
+				<li>Add support for more native synchronization APIs (PS2? PSP? Cocoa?)</li>
+				<li>Add more robust test suite.</li>
+			</ul>
+
+		<h2>Revision History</h2>
+		
+		<div class="rev">
+		
+			<h3 class="rev">0.5 (2007-10-17)</h3>
+			<ul class="rev">
+                <li>Added Visual Studio 2005 solution and project files.</li>
+			    <li>Added basic 'make' build system.</li>
+			    <li>Changed return type of thread join APIs.</li>
+			    <li>Began adding a few comments in the header.</li>
+                <li>Fixed a few minor compiler warnings exposed by adding -pedantic.</li>
+				<li>Improved POSIX compatibility by defining _XOPEN_SOURCE before including pthread.h.</li>
+			</ul>
+			
+			<h3 class="rev">0.4 (2007-09-29)</h3>
+			<ul class="rev">
+				<li>Fixed warnings related to casting thread user data pointer and return values.</li>
+				<li>Improved thread creation API.</li>
+				<li>Rewrote thread priority and stack size code.</li>
+				<li>Added additional constructor to mutex classes.</li>
+			</ul>
+			
+			<h3 class="rev">0.3 (2007-09-24)</h3>
+			<ul class="rev">
+				<li>Fixed bug in threading test.</li>
+				<li>Fixed POSIX mutex to allow recursion.</li>
+				<li>Removed redundant null pointer checks in C++ wrappers.</li>
+				<li>Added psyncMutexAuto class.</li>
+			</ul>
+			
+			<h3 class="rev">0.2 (2007-09-23)</h3>
+			<ul class="rev">
+				<li>Added C++ wrappers for threads, mutexes, and semaphores.</li>
+			</ul>
+			
+			<h3 class="rev">0.1 (2007-09-21)</h3>
+			<ul class="rev">
+				<li>Contains very basic APIs for creating threads, mutexes, and semaphores.</li>
+				<li>Has implementations for Win32, POSIX, and PS3 (PS3 version available only to registered PS3 developers).</li>
+			</ul>
+		</div>
+
+		<p>Copyright (c) 2007, Benbuck Nason</p>
+
+		<p>
+		  <a href="http://validator.w3.org/check?uri=referer">
+			<img src="http://www.w3.org/Icons/valid-xhtml10-blue" alt="Valid XHTML 1.0 Strict" height="31" width="88" />
+		  </a>
+		</p>
+		
+	</body>
+	
+</html>
