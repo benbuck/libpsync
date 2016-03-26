@@ -4,7 +4,7 @@ libpsync
 https://sourceforge.net/projects/libpsync/
 
 The libpsync library provides lightweight portable synchronization primitives
-(thread, mutex, semaphore, etc.) for C/C++ under a non-restrictive license.
+(thread, mutex, semaphore) for C/C++ under a non-restrictive license.
 
 This is an open source library, for more information on the licensing of the
 code please read LICENSE.TXT (which is a standard new BSD license).
@@ -15,20 +15,27 @@ To Do
 
 For version 1.0:
 
-* Add build files (automake? CMake? Visual SlickEdit? ...)
+* Add more build files (automake? ...)
 * Add documentation.
 * Review return value handling.
 
 Post 1.0:
 
 * Add more features to existing APIs.
-* Add more synchronization primitives (conditionals, events, etc.)
+* Add more synchronization primitives (conditions, events, etc.)
 * Add support for more native synchronization APIs (PS2? PSP? Cocoa?)
 * Add more robust test suite.
 
 
 Revision History
 ----------------
+
+0.6 (2007-11-08)
+* Improved POSIX compatibility under Linux and MacOSX.
+* Added basic 'CMake' build system.
+* Minor improvements to 'make' system.
+* Began adding Doxygen support.
+* Added another thread test.
 
 0.5 (2007-10-17)
 * Added Visual Studio 2005 solution and project files.

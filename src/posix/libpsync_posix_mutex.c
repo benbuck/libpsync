@@ -35,7 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "libpsync.h"
 #define _XOPEN_SOURCE 500
 #include <pthread.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 typedef struct psync_mutex_t_
 {

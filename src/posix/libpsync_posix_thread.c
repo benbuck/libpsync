@@ -33,6 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "libpsync.h"
+#define _XOPEN_SOURCE 500
 #include <pthread.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -60,8 +61,8 @@ psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * use
 	struct sched_param param;
 	psync_thread_t thread;
 
-	priority_min = sched_get_priority_min(SCHED_OTHER);
-	priority_max = sched_get_priority_max(SCHED_OTHER);
+	priority_min = sched_get_priority_min(SCHED_FIFO);
+	priority_max = sched_get_priority_max(SCHED_FIFO);
 	priority_mid = priority_min + (priority_max - priority_min + 1) / 2;
 	if ((priority_min == -1) || (priority_max == -1))
 	{
@@ -99,7 +100,7 @@ psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * use
 
 	if (thread_param == NULL)
 	{
-		stack_size = 0;
+		stack_size = PTHREAD_STACK_MIN;
 	}
 	else
 	{
@@ -125,6 +126,13 @@ psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * use
 	}
 
 	res = pthread_attr_setstacksize(&attr, stack_size);
+	if (res != 0)
+	{
+		pthread_attr_destroy(&attr);
+		return NULL;
+	}
+
+	res = pthread_attr_setschedpolicy(&attr, SCHED_FIFO);
 	if (res != 0)
 	{
 		pthread_attr_destroy(&attr);

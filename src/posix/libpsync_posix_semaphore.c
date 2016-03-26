@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "libpsync.h"
 #include <semaphore.h>
-#include <malloc.h>
+#include <stdlib.h>
 
 typedef struct psync_semaphore_t_
 {

@@ -4,7 +4,7 @@ else
 	HOST_OS ?= WIN32
 endif
 	
-TARGET_OS ?= PS3
+TARGET_OS ?= $(HOST_OS)
 ifeq ($(TARGET_OS), LINUX)
 	EXE_EXT ?=
 	LIB_EXT ?= .a
@@ -25,7 +25,6 @@ ifeq ($(TARGET_OS), PS3)
 	COMPILER ?= $(CELL_HOST_PATH)/ppu/bin/ppu-lv2-gcc
 	LIBRARIAN ?= $(CELL_HOST_PATH)/ppu/bin/ppu-lv2-ar
 	LINKER ?= $(CELL_HOST_PATH)/ppu/bin/ppu-lv2-g++
-	LD_LIBS += c
 endif
 
 COMPILER ?= gcc
@@ -35,7 +34,6 @@ COMPILER_FLAGS ?= \
 	-pedantic \
 	-W \
 	-Wall \
-	-Wuninitialized \
 	-Wcomment \
 	-Wchar-subscripts \
 	-Wdeprecated-declarations \
@@ -63,15 +61,16 @@ COMPILER_FLAGS ?= \
 LIBRARIAN ?= ar
 LIBRARIAN_FLAGS ?= -rcs
 LINKER ?= g++
+LD_LIBS += c
 LINKER_FLAGS ?= \
 	$(addprefix -l,$(LD_LIBS))
 
 MODE ?= DEBUG
 ifeq ($(MODE), DEBUG)
-	COMPILER_FLAGS += -g -O -DDEBUG
+	COMPILER_FLAGS += -g -O0 -DDEBUG
 else
 	ifeq ($(MODE), RELEASE)
-		COMPILER_FLAGS += -O3 -DNDEBUG
+		COMPILER_FLAGS += -Wuninitialized -O3 -DNDEBUG
 	else
 		ERROR := $(error unknown MODE=$(MODE))
 	endif

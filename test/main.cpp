@@ -165,6 +165,7 @@ static void test_thread_cxx(void)
 	memset(&thread_param, 0, sizeof(thread_param));
 	thread_param.stack_size.relative = 2.0f;
 	thread_param.stack_size.absolute = 16 * 1024;
+	thread_param.priority.absolute = 1;
 	thread_param.priority.relative = 0.0f;
 	thread_param.name = "test_thread";
 	psyncThread thread(test_thread_entry, (void *)&test_thread_counter, &thread_param);
@@ -173,6 +174,18 @@ static void test_thread_cxx(void)
 	void * return_value;
 	thread.Join(&return_value);
 	assert(test_thread_counter == 1);
+	assert(return_value == (void *)&test_thread_counter);
+
+	thread_param.stack_size.relative = 0.5f;
+	thread_param.stack_size.absolute = 0;
+	thread_param.priority.absolute = -1;
+	thread_param.priority.relative = 0.0f;
+	thread_param.name = "test_thread_2";
+	psyncThread thread2(test_thread_entry, (void *)&test_thread_counter, &thread_param);
+	assert(thread2.IsValid());
+
+	thread2.Join(&return_value);
+	assert(test_thread_counter == 2);
 	assert(return_value == (void *)&test_thread_counter);
 }
 

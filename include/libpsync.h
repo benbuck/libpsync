@@ -75,7 +75,7 @@ psync_bool_t psync_mutex_try(psync_mutex_t mutex);
 /** Opaque semaphore handle. **/
 typedef struct psync_semaphore_t_ * psync_semaphore_t;
 
-/** Create a semaphore.**/
+/** Create a semaphore. **/
 psync_semaphore_t psync_semaphore_create(int initial_count, int max_count);
 /** Destroy a semaphore. **/
 void psync_semaphore_destroy(psync_semaphore_t semaphore);
