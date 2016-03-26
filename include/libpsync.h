@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2007, Benbuck Nason
+Copyright (c) 2007-2009, Benbuck Nason
 
 All rights reserved.
 
@@ -138,13 +138,13 @@ public:
 	{
 	}
 
-	psyncMutex(psyncMutex & mutex) :
+	explicit psyncMutex(psyncMutex & mutex) :
 		mMutex(mutex.mMutex),
 		mOwner(false)
 	{
 	}
 
-	psyncMutex(psync_mutex_t mutex) :
+	explicit psyncMutex(psync_mutex_t mutex) :
 		mMutex(mutex),
 		mOwner(false)
 	{
@@ -158,6 +158,17 @@ public:
 		}
 	}
 
+	psyncMutex & operator= (const psyncMutex & rhs)
+	{
+		if (&rhs != this)
+		{
+			mMutex = rhs.mMutex;
+			mOwner = false;	
+		}
+		
+		return *this;
+	}
+	
 	bool IsValid(void) const
 	{
 		return mMutex != NULL;
@@ -179,6 +190,10 @@ public:
 	}
 
 protected:
+	/* copying not allowed */
+	psyncMutex(const psyncMutex &) : mMutex(NULL), mOwner(false) {}
+	psyncMutex & operator= (const psyncMutex &) { return *this; }
+
 	psync_mutex_t mMutex;
 	bool mOwner;
 };
@@ -189,13 +204,13 @@ protected:
 class psyncMutexAuto
 {
 public:
-	psyncMutexAuto(psyncMutex & mutex) :
+	explicit psyncMutexAuto(psyncMutex & mutex) :
 		mMutex(mutex.mMutex),
 		mObtained(psync_mutex_obtain(mMutex) == psync_bool_true)
 	{
 	}
 
-	psyncMutexAuto(psync_mutex_t mutex) :
+	explicit psyncMutexAuto(psync_mutex_t mutex) :
 		mMutex(mutex),
 		mObtained(psync_mutex_obtain(mMutex) == psync_bool_true)
 	{
@@ -218,6 +233,10 @@ protected:
 	/* default construction not allowed */
 	psyncMutexAuto(void) : mMutex(NULL), mObtained(false) { }
 
+	/* copying not allowed */
+	psyncMutexAuto(const psyncMutexAuto &) : mMutex(NULL), mObtained(false) {}
+	psyncMutexAuto & operator= (const psyncMutexAuto &) { return *this; }
+
 	psync_mutex_t mMutex;
 	bool mObtained;
 };
@@ -234,7 +253,7 @@ public:
 	{
 	}
 
-	psyncSemaphore(psyncSemaphore & semaphore) :
+	explicit psyncSemaphore(psyncSemaphore & semaphore) :
 		mSemaphore(semaphore.mSemaphore),
 		mOwner(false)
 	{
@@ -248,6 +267,17 @@ public:
 		}
 	}
 
+	psyncSemaphore & operator= (const psyncSemaphore & rhs)
+	{
+		if (&rhs != this)
+		{
+			mSemaphore = rhs.mSemaphore;
+			mOwner = false;
+		}
+		
+		return *this;
+	}
+	
 	bool IsValid(void) const
 	{
 		return mSemaphore != NULL;
@@ -271,6 +301,10 @@ public:
 protected:
 	/* default construction not allowed */
 	psyncSemaphore(void) : mSemaphore(NULL), mOwner(false) { }
+
+	/* copying not allowed */
+	psyncSemaphore(const psyncSemaphore &) : mSemaphore(NULL), mOwner(false) {}
+	psyncSemaphore & operator= (const psyncSemaphore &) { return *this; }
 
 	psync_semaphore_t mSemaphore;
 	bool mOwner;
@@ -299,12 +333,18 @@ public:
 
 	bool Join(void ** return_value)
 	{
-		return psync_thread_join(mThread, return_value) == psync_bool_true;
+		bool result = psync_thread_join(mThread, return_value) == psync_bool_true;
+		mThread = NULL;
+		return result;
 	}
 
 protected:
 	/* default construction not allowed */
 	psyncThread(void) : mThread(NULL) { }
+
+	/* copying not allowed */
+	psyncThread(const psyncThread &) : mThread(NULL) {}
+	psyncThread & operator= (const psyncThread &) { return *this; }
 
 	psync_thread_t mThread;
 };

@@ -15,6 +15,7 @@ To Do
 
 For version 1.0:
 
+* Add Mach kernel API implementation.
 * Add more build files (automake? ...)
 * Add documentation.
 * Review return value handling.
@@ -29,6 +30,22 @@ Post 1.0:
 
 Revision History
 ----------------
+
+0.7 (2009-04-11)
+* Allow copy and assign in C++ mutex and semaphore wrappers.
+* Add explicit keyword in C++ wrapper constructors.
+* Add platform to output directory name when building with make.
+* Add nested threading test.
+* Fixed compiler warning in POSIX thread implementation.
+* Fixed incorrect POSIX semaphore initialization.
+* Fixed crash on double-join in psyncThread class.
+* Fixed PS3 tool path handling.
+* Increased warning levels for 'make' system.
+* Added pthread lib to link when building executables for posix platform.
+* Added ignore properties to svn for output files in "make" directory.
+* Added ignore properties to svn for "src/ps3" directory.
+* Added ignore properties to svn for "vstudio" directory.
+* Update copyright notices.
 
 0.6 (2007-11-08)
 * Improved POSIX compatibility under Linux and MacOSX.
@@ -66,4 +83,4 @@ Revision History
   to registered PS3 developers).
 
 
-Copyright (c) 2007, Benbuck Nason
+Copyright (c) 2007-2009, Benbuck Nason

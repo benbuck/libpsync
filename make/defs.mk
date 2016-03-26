@@ -22,9 +22,9 @@ ifeq ($(TARGET_OS), PS3)
 	EXE_EXT ?= .elf
 	LIB_EXT ?= .a
 	CSTD ?= -std=c99
-	COMPILER ?= $(CELL_HOST_PATH)/ppu/bin/ppu-lv2-gcc
-	LIBRARIAN ?= $(CELL_HOST_PATH)/ppu/bin/ppu-lv2-ar
-	LINKER ?= $(CELL_HOST_PATH)/ppu/bin/ppu-lv2-g++
+	COMPILER ?= "$(CELL_HOST_PATH)/ppu/bin/ppu-lv2-gcc"
+	LIBRARIAN ?= "$(CELL_HOST_PATH)/ppu/bin/ppu-lv2-ar"
+	LINKER ?= "$(CELL_HOST_PATH)/ppu/bin/ppu-lv2-g++"
 endif
 
 COMPILER ?= gcc
@@ -34,17 +34,17 @@ COMPILER_FLAGS ?= \
 	-pedantic \
 	-W \
 	-Wall \
-	-Wcomment \
-	-Wchar-subscripts \
+	-Wextra \
+	-Waggregate-return \
+	-Wcast-align \
+	-Wcast-qual \
 	-Wdeprecated-declarations \
 	-Wendif-labels \
+	-Wfloat-equal \
 	-Wformat=2 \
-	-Wformat-extra-args \
-	-Wimplicit \
 	-Wimport \
 	-Winline \
-	-Wmissing-braces \
-	-Wparentheses \
+	-Wpacked \
 	-Wpointer-arith \
 	-Wredundant-decls \
 	-Wreturn-type \
@@ -53,11 +53,35 @@ COMPILER_FLAGS ?= \
 	-Wswitch \
 	-Wunknown-pragmas \
 	-Wunused \
-	-Wwrite-strings \
+	-Wstrict-aliasing=2 \
 	-Wswitch-default \
 	-Wswitch-enum \
-	-Wfloat-equal \
-	-Wpacked
+	-Wundef \
+	-Wunknown-pragmas \
+	-Wunused \
+	-Wwrite-strings
+#	-Wconversion
+#	-Wpadded
+#	-Wunreachable-code
+#	-Wvolatile-register-var
+C_FLAGS ?= \
+	-Wbad-function-cast \
+	-Wdeclaration-after-statement \
+	-Wmissing-declarations \
+	-Wmissing-prototypes \
+	-Wnested-externs \
+	-Wold-style-definition \
+	-Wstrict-prototypes
+#	-Wc++-compat
+#	-Wtraditional
+CXX_FLAGS ?= \
+	-fno-nonansi-builtins \
+	-Wabi \
+	-Wctor-dtor-privacy \
+	-Weffc++ \
+	-Woverloaded-virtual \
+	-Wsign-promo
+#	-Wstrict-null-sentinel
 LIBRARIAN ?= ar
 LIBRARIAN_FLAGS ?= -rcs
 LINKER ?= g++
@@ -88,7 +112,11 @@ ifeq ($(PLATFORM),)
 	endif
 endif
 
-OUTPUT_DIR ?= $(TARGET_OS)_$(MODE)
+ifeq ($(PLATFORM),posix)
+	LD_LIBS += pthread
+endif
+
+OUTPUT_DIR ?= $(TARGET_OS)_$(MODE)_$(PLATFORM)
 
 ifeq ($(TERM),)
 	RM ?= del

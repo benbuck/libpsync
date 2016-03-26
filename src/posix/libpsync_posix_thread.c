@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2007, Benbuck Nason
+Copyright (c) 2007-2009, Benbuck Nason
 
 All rights reserved.
 
@@ -109,7 +109,7 @@ psync_thread_t psync_thread_create(psync_thread_entry_t thread_entry, void * use
 			return NULL;
 		}
 
-		stack_size = (PTHREAD_STACK_MIN * thread_param->stack_size.relative) + thread_param->stack_size.absolute;
+		stack_size = (size_t)((PTHREAD_STACK_MIN * thread_param->stack_size.relative) + thread_param->stack_size.absolute);
 	}
 
 	res = pthread_attr_init(&attr);

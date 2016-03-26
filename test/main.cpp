@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2007, Benbuck Nason
+Copyright (c) 2007-2009, Benbuck Nason
 
 All rights reserved.
 
@@ -34,7 +34,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "libpsync.h"
 #include <assert.h>
-#include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -45,7 +44,9 @@ static void test_semaphore(void);
 static void test_semaphore_cxx(void);
 static void test_thread(void);
 static void test_thread_cxx(void);
+static void test_thread_nesting(void);
 static void * test_thread_entry(void * user_data);
+static void * test_thread_entry_nested(void * user_data);
 
 void test_mutex(void)
 {
@@ -142,7 +143,7 @@ static void test_thread(void)
 	psync_bool_t res;
 	psync_thread_t thread;
 	void * return_value;
-	volatile int test_thread_counter;
+	int test_thread_counter;
 
 	printf("testing thread\n");
 
@@ -160,7 +161,7 @@ static void test_thread_cxx(void)
 {
 	printf("testing thread c++\n");
 
-	volatile int test_thread_counter = 0;
+	int test_thread_counter = 0;
 	psync_thread_param_t thread_param;
 	memset(&thread_param, 0, sizeof(thread_param));
 	thread_param.stack_size.relative = 2.0f;
@@ -189,6 +190,29 @@ static void test_thread_cxx(void)
 	assert(return_value == (void *)&test_thread_counter);
 }
 
+static void test_thread_nesting(void)
+{
+	printf("testing thread nesting\n");
+
+	int test_thread_counter = 0;
+	psync_thread_param_t thread_param;
+	memset(&thread_param, 0, sizeof(thread_param));
+	thread_param.stack_size.relative = 1.0f;
+	thread_param.priority.absolute = 1;
+	thread_param.name = "test_thread";
+	psyncThread thread(test_thread_entry, (void *)&test_thread_counter, &thread_param);
+	assert(thread.IsValid());
+
+	thread_param.name = "test_thread_nested";
+	psyncThread thread2(test_thread_entry_nested, (void *)&thread, &thread_param);
+	assert(thread2.IsValid());
+
+	void * return_value;
+	thread2.Join(&return_value);
+	assert(test_thread_counter == 1);
+	assert(return_value == (void *)&thread);
+}
+
 static void * test_thread_entry(void * user_data)
 {
 	int * test_thread_counter = (int *)user_data;
@@ -206,6 +230,23 @@ static void * test_thread_entry(void * user_data)
 	return user_data;
 }
 
+static void * test_thread_entry_nested(void * user_data)
+{
+	psyncThread * thread = (psyncThread *)user_data;
+
+	printf(" inside test_thread_entry_nested\n");
+	
+	printf(" joining other thread\n");
+	void * return_value;
+	thread->Join(&return_value);
+	
+	printf(" exiting\n");
+	psync_thread_exit(user_data);
+
+	assert(0);
+	return user_data;	
+}
+
 int main(void)
 {
 	test_mutex();
@@ -214,6 +255,7 @@ int main(void)
 	test_semaphore_cxx();
 	test_thread();
 	test_thread_cxx();
+	test_thread_nesting();
 
 	printf("success\n");
 	return EXIT_SUCCESS;

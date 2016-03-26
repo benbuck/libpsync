@@ -39,7 +39,7 @@ debug:
 define EXE_target
 ifeq ($$(TARGET_OS),PS3)
 $$(TARGET_SELF_$(1)): $$(TARGET_EXE_$(1))
-	$$(CELL_HOST_PATH)/bin/make_fself $$< $$@ 
+	"$$(CELL_HOST_PATH)/bin/make_fself" $$< $$@ 
 endif
 $$(TARGET_EXE_$(1)): $$(OBJS_EXE_$(1)) $$(TARGET_LIBS_EXE_test)
 	@echo Building $$@
@@ -60,11 +60,11 @@ define BIN_target
 $$(CPP_OBJS_$(2)_$(1)): $$(OUTPUT_DIR)/$(2)_$(1)/%.o: %.cpp
 	-@$$(MKDIRP) "$$(dir $$(@))"
 	$(addprefix -I,$(INCLUDE_DIRS))
-	$$(COMPILER) -c $$(CXXSTD) $$(COMPILER_FLAGS) $$(addprefix -I,$$(INCS_$(2)_$(1))) -Wp,-MMD,$$(@:.o=.d),-MT,$$@ -o $$@ $$<
+	$$(COMPILER) -c $$(CXXSTD) $$(COMPILER_FLAGS) $$(CXX_FLAGS) $$(addprefix -I,$$(INCS_$(2)_$(1))) -Wp,-MMD,$$(@:.o=.d),-MT,$$@ -o $$@ $$<
 	
 $$(C_OBJS_$(2)_$(1)): $$(OUTPUT_DIR)/$(2)_$(1)/%.o: %.c
 	-@$$(MKDIRP) "$$(dir $$(@))"
-	$$(COMPILER) -c $$(CSTD) $$(COMPILER_FLAGS) $$(addprefix -I,$$(INCS_$(2)_$(1))) -Wp,-MMD,$$(@:.o=.d),-MT,$$@ -o $$@ $$<
+	$$(COMPILER) -c $$(CSTD) $$(COMPILER_FLAGS) $$(C_FLAGS) $$(addprefix -I,$$(INCS_$(2)_$(1))) -Wp,-MMD,$$(@:.o=.d),-MT,$$@ -o $$@ $$<
 endef
 $(foreach bin,$(EXES),$(eval $(call BIN_target,$(bin),EXE)))
 $(foreach bin,$(LIBS),$(eval $(call BIN_target,$(bin),LIB)))

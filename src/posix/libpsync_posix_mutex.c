@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2007, Benbuck Nason
+Copyright (c) 2007-2009, Benbuck Nason
 
 All rights reserved.
 

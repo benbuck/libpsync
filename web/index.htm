@@ -43,7 +43,6 @@
 				font-size: 105%;
 				font-family: sans-serif;
 			}
-			
 			ul.rev
 			{
 				padding-top: 0;
@@ -52,7 +51,7 @@
 				margin-bottom: 1%;
 			}
 			
-		</style>        
+		</style>
 		
 	</head>
 	
@@ -75,14 +74,15 @@
 
 		<h2>To Do</h2>
 		
-		    <p>For version 1.0:</p>
+			<p>For version 1.0:</p>
 			<ul>
+				<li>Mach kernel API implementation.</li>
 				<li>Add build files (automake? ...)</li>
 				<li>Add documentation.</li>
 				<li>Review return value handling</li>
 			</ul>
 			
-		    <p>Post 1.0:</p>
+			<p>Post 1.0:</p>
 			<ul>
 				<li>Add more features to existing APIs.</li>
 				<li>Add more synchronization primitives (conditions, events, etc.)</li>
@@ -94,22 +94,40 @@
 		
 		<div class="rev">
 		
+			<h3 class="rev">0.7 (2009-04-11)</h3>
+			<ul class="rev">
+				<li>Allow copy and assign in C++ mutex and semaphore wrappers.</li>
+				<li>Add explicit keyword in C++ wrapper constructors.</li>
+				<li>Add platform to output directory name when building with make.</li>
+				<li>Add nested threading test.</li>
+				<li>Fixed compiler warning in POSIX thread implementation.</li>
+				<li>Fixed incorrect POSIX semaphore initialization.</li>
+				<li>Fixed crash on double-join in psyncThread class.</li>
+				<li>Fixed PS3 tool path handling.</li>
+				<li>Increased warning levels for 'make' system.</li>
+				<li>Added pthread lib to link when building executables for posix platform.</li>
+				<li>Added ignore properties to svn for output files in "make" directory.</li>
+				<li>Added ignore properties to svn for "src/ps3" directory.</li>
+				<li>Added ignore properties to svn for "vstudio" directory.</li>
+				<li>Update copyright notices.</li>
+			</ul>
+			
 			<h3 class="rev">0.6 (2007-11-08)</h3>
 			<ul class="rev">
-                <li>Improved POSIX compatibility under Linux and MacOSX.</li>
-                <li>Added basic 'CMake' build system.</li>
-                <li>Minor improvements to 'make' system.</li>
-                <li>Began adding Doxygen support.</li>
-                <li>Added another thread test.</li>
-            </ul>
-            
+				<li>Improved POSIX compatibility under Linux and MacOSX.</li>
+				<li>Added basic 'CMake' build system.</li>
+				<li>Minor improvements to 'make' system.</li>
+				<li>Began adding Doxygen support.</li>
+				<li>Added another thread test.</li>
+			</ul>
+			
 			<h3 class="rev">0.5 (2007-10-17)</h3>
 			<ul class="rev">
-                <li>Added Visual Studio 2005 solution and project files.</li>
-			    <li>Added basic 'make' build system.</li>
-			    <li>Changed return type of thread join APIs.</li>
-			    <li>Began adding a few comments in the header.</li>
-                <li>Fixed a few minor compiler warnings exposed by adding -pedantic.</li>
+				<li>Added Visual Studio 2005 solution and project files.</li>
+				<li>Added basic 'make' build system.</li>
+				<li>Changed return type of thread join APIs.</li>
+				<li>Began adding a few comments in the header.</li>
+				<li>Fixed a few minor compiler warnings exposed by adding -pedantic.</li>
 				<li>Improved POSIX compatibility by defining _XOPEN_SOURCE before including pthread.h.</li>
 			</ul>
 			
@@ -141,12 +159,12 @@
 			</ul>
 		</div>
 
-		<p>Copyright (c) 2007, Benbuck Nason</p>
+		<p>Copyright (c) 2007-2009 Benbuck Nason</p>
 
 		<p>
-		  <a href="http://validator.w3.org/check?uri=referer">
-			<img src="http://www.w3.org/Icons/valid-xhtml10-blue" alt="Valid XHTML 1.0 Strict" height="31" width="88" />
-		  </a>
+			<a href="http://validator.w3.org/check?uri=referer">
+				<img src="http://www.w3.org/Icons/valid-xhtml10-blue" alt="Valid XHTML 1.0 Strict" height="31" width="88" />
+			</a>
 		</p>
 		
 	</body>

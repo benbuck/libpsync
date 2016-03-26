@@ -1,6 +1,6 @@
 /*
 
-Copyright (c) 2007, Benbuck Nason
+Copyright (c) 2007-2009, Benbuck Nason
 
 All rights reserved.
 
@@ -47,7 +47,10 @@ psync_semaphore_t psync_semaphore_create(int initial_count, int max_count)
 	sem_t sem;
 	psync_semaphore_t semaphore;
 
-	res = sem_init(&sem, initial_count, max_count);
+	/* FIX - any way to use max_count? */
+	(void)max_count;
+
+	res = sem_init(&sem, 0, initial_count);
 	if (res != 0)
 	{
 		return NULL;
