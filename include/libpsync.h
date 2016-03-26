@@ -41,6 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif /* __cplusplus */
 
+/** C interface **/
 
 /** Common **/
 
@@ -58,8 +59,8 @@ typedef struct psync_mutex_t_ * psync_mutex_t;
 psync_mutex_t psync_mutex_create(void);
 void psync_mutex_destroy(psync_mutex_t mutex);
 psync_bool_t psync_mutex_obtain(psync_mutex_t mutex);
-psync_bool_t psync_mutex_try(psync_mutex_t mutex);
 void psync_mutex_release(psync_mutex_t mutex);
+psync_bool_t psync_mutex_try(psync_mutex_t mutex);
 
 
 /** Semaphore **/
@@ -87,6 +88,174 @@ void psync_thread_sleep(unsigned int microseconds);
 
 #ifdef __cplusplus
 }
+
+/** C++ wrappers **/
+
+#include <cstddef>
+
+/** Mutex **/
+
+class psyncMutex
+{
+public:
+	psyncMutex(void) :
+		mMutex(psync_mutex_create()),
+		mOwner(true)
+	{
+	}
+
+	psyncMutex(psyncMutex & mutex) :
+		mMutex(mutex.mMutex),
+		mOwner(false)
+	{
+	}
+
+	~psyncMutex(void)
+	{
+		if (mOwner)
+		{
+			psync_mutex_destroy(mMutex);
+		}
+	}
+
+	bool IsValid(void) const
+	{
+		return mMutex != NULL;
+	}
+
+	bool Obtain(void)
+	{
+		if (mMutex == NULL)
+		{
+			return false;
+		}
+		return psync_mutex_obtain(mMutex) == psync_bool_true;
+	}
+
+	void Release(void)
+	{
+		if (mMutex == NULL)
+		{
+			return;
+		}
+		psync_mutex_release(mMutex);
+	}
+
+	bool Try(void)
+	{
+		if (mMutex == NULL)
+		{
+			return false;
+		}
+		return psync_mutex_try(mMutex) == psync_bool_true;
+	}
+
+protected:
+	psync_mutex_t mMutex;
+	bool mOwner;
+};
+
+/** Semaphore **/
+
+class psyncSemaphore
+{
+public:
+	psyncSemaphore(int initial_count, int max_count) :
+		mSemaphore(psync_semaphore_create(initial_count, max_count)),
+		mOwner(true)
+	{
+	}
+
+	psyncSemaphore(psyncSemaphore & semaphore) :
+		mSemaphore(semaphore.mSemaphore),
+		mOwner(false)
+	{
+	}
+
+	~psyncSemaphore(void)
+	{
+		if (mOwner)
+		{
+			psync_semaphore_destroy(mSemaphore);
+		}
+	}
+
+	bool IsValid(void) const
+	{
+		return mSemaphore != NULL;
+	}
+
+	bool Signal(void)
+	{
+		if (mSemaphore == NULL)
+		{
+			return false;
+		}
+		return psync_semaphore_signal(mSemaphore) == psync_bool_true;
+	}
+
+	bool Wait(void)
+	{
+		if (mSemaphore == NULL)
+		{
+			return false;
+		}
+		return psync_semaphore_wait(mSemaphore) == psync_bool_true;
+	}
+
+	bool Try(void)
+	{
+		if (mSemaphore == NULL)
+		{
+			return false;
+		}
+		return psync_semaphore_try(mSemaphore) == psync_bool_true;
+	}
+
+protected:
+	// default construction not allowed
+	psyncSemaphore(void) : mSemaphore(NULL), mOwner(false) { }
+
+	psync_semaphore_t mSemaphore;
+	bool mOwner;
+};
+
+/** Thread **/
+
+class psyncThread
+{
+public:
+	psyncThread(psync_thread_entry_t thread_entry, void * user_data, int priority, unsigned int stack_size, char const * name) :
+		mThread(psync_thread_create(thread_entry, user_data, priority, stack_size, name))
+	{
+	}
+
+	~psyncThread(void)
+	{
+		psync_thread_join(mThread, NULL);
+	}
+
+	bool IsValid(void) const
+	{
+		return mThread != NULL;
+	}
+
+	void Join(void ** return_value)
+	{
+		if (mThread == NULL)
+		{
+			return;
+		}
+		psync_thread_join(mThread, return_value);
+	}
+
+protected:
+	// default construction not allowed
+	psyncThread(void) : mThread(NULL) { }
+
+	psync_thread_t mThread;
+};
+
 #endif /* __cplusplus */
 
 #endif /* _libpsync_h_ */

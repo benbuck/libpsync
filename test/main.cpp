@@ -40,8 +40,11 @@ POSSIBILITY OF SUCH DAMAGE.
 static volatile int test_thread_counter /* = 0 */;
 
 static void test_mutex(void);
+static void test_mutex_cxx(void);
 static void test_semaphore(void);
+static void test_semaphore_cxx(void);
 static void test_thread(void);
+static void test_thread_cxx(void);
 static void * test_thread_entry(void * user_data);
 
 void test_mutex(void)
@@ -60,6 +63,29 @@ void test_mutex(void)
 	psync_mutex_release(mutex);
 
 	psync_mutex_destroy(mutex);
+}
+
+void test_mutex_cxx(void)
+{
+	bool res;
+
+	printf("testing mutex c++\n");
+
+	psyncMutex mutex1;
+	assert(mutex1.IsValid());
+
+	psyncMutex mutex2(mutex1);
+	assert(mutex2.IsValid());
+
+	res = mutex1.Obtain();
+	assert(res);
+
+	res = mutex2.Try();
+	assert(res);
+
+	mutex2.Release();
+
+	mutex1.Release();
 }
 
 void test_semaphore(void)
@@ -81,6 +107,31 @@ void test_semaphore(void)
 	psync_semaphore_destroy(semaphore);
 }
 
+void test_semaphore_cxx(void)
+{
+	bool res;
+
+	printf("testing semaphore c++\n");
+
+	psyncSemaphore semaphore1(0, 1);
+	assert(semaphore1.IsValid());
+
+	psyncSemaphore semaphore2(semaphore1);
+	assert(semaphore2.IsValid());
+
+	res = semaphore1.Signal();
+	assert(res);
+
+	res = semaphore2.Wait();
+	assert(res);
+
+	res = semaphore2.Signal();
+	assert(res);
+
+	res = semaphore1.Wait();
+	assert(res);
+}
+
 static void test_thread(void)
 {
 	psync_thread_t thread;
@@ -88,13 +139,27 @@ static void test_thread(void)
 
 	printf("testing thread\n");
 
-	thread = psync_thread_create(test_thread_entry, (void *)&thread, PSYNC_THREAD_PRIORITY_DEFAULT, PSYNC_THREAD_STACK_SIZE_DEFAULT, "test_thread");
+	thread = psync_thread_create(test_thread_entry, (void *)&test_thread_counter, PSYNC_THREAD_PRIORITY_DEFAULT, PSYNC_THREAD_STACK_SIZE_DEFAULT, "test_thread");
 	assert(thread);
 
-	assert(test_thread_counter == 0);
+	test_thread_counter = 0;
 	psync_thread_join(thread, &return_value);
 	assert(test_thread_counter == 1);
-	assert(return_value == (void *)&thread);
+	assert(return_value == (void *)&test_thread_counter);
+}
+
+static void test_thread_cxx(void)
+{
+	printf("testing thread c++\n");
+
+	psyncThread thread(test_thread_entry, (void *)&test_thread_counter, PSYNC_THREAD_PRIORITY_DEFAULT, PSYNC_THREAD_STACK_SIZE_DEFAULT, "test_thread");
+	assert(thread.IsValid());
+
+	void * return_value;
+	test_thread_counter = 0;
+	thread.Join(&return_value);
+	assert(test_thread_counter == 1);
+	assert(return_value == (void *)&test_thread_counter);
 }
 
 static void * test_thread_entry(void * user_data)
@@ -102,8 +167,8 @@ static void * test_thread_entry(void * user_data)
 	printf(" inside test_thread_entry\n");
 	++test_thread_counter;
 
-	printf(" sleeping for 5 seconds\n");
-	psync_thread_sleep(5 * 1000 * 1000);
+	printf(" sleeping for 2 seconds\n");
+	psync_thread_sleep(2 * 1000 * 1000);
 
 	printf(" exiting\n");
 	psync_thread_exit(user_data);
@@ -115,8 +180,11 @@ static void * test_thread_entry(void * user_data)
 int main(void)
 {
 	test_mutex();
+	test_mutex_cxx();
 	test_semaphore();
+	test_semaphore_cxx();
 	test_thread();
+	test_thread_cxx();
 
 	printf("success\n");
 	return EXIT_SUCCESS;

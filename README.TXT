@@ -20,10 +20,15 @@ To Do
 * Add support for more native synchronization APIs (PS2? PSP? Cocoa?)
 * Add more robust test suite.
 * Add documentation.
+* Review return value handling.
 
 
 Revision History
 ----------------
+
+0.3 (2007-09-23)
+
+* Added C++ wrappers for threads, mutexes, and semaphores.
 
 0.1 (2007-09-21)
 

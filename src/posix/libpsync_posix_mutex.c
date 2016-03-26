@@ -97,6 +97,16 @@ psync_bool_t psync_mutex_obtain(psync_mutex_t mutex)
 	return psync_bool_true;
 }
 
+void psync_mutex_release(psync_mutex_t mutex)
+{
+	if (mutex == NULL)
+	{
+		return;
+	}
+
+	pthread_mutex_unlock(&mutex->pthread_mutex);
+}
+
 psync_bool_t psync_mutex_try(psync_mutex_t mutex)
 {
 	int res;
@@ -113,14 +123,4 @@ psync_bool_t psync_mutex_try(psync_mutex_t mutex)
 	}
 
 	return psync_bool_true;
-}
-
-void psync_mutex_release(psync_mutex_t mutex)
-{
-	if (mutex == NULL)
-	{
-		return;
-	}
-
-	pthread_mutex_unlock(&mutex->pthread_mutex);
 }

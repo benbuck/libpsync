@@ -89,16 +89,6 @@ psync_bool_t psync_mutex_obtain(psync_mutex_t mutex)
 	return psync_bool_true;
 }
 
-psync_bool_t psync_mutex_try(psync_mutex_t mutex)
-{
-	if (mutex == NULL)
-	{
-		return psync_bool_false;
-	}
-
-	return TryEnterCriticalSection(&mutex->m_critical_section) ? psync_bool_true : psync_bool_false;
-}
-
 void psync_mutex_release(psync_mutex_t mutex)
 {
 	if (mutex == NULL)
@@ -107,4 +97,14 @@ void psync_mutex_release(psync_mutex_t mutex)
 	}
 
 	LeaveCriticalSection(&mutex->m_critical_section);
+}
+
+psync_bool_t psync_mutex_try(psync_mutex_t mutex)
+{
+	if (mutex == NULL)
+	{
+		return psync_bool_false;
+	}
+
+	return TryEnterCriticalSection(&mutex->m_critical_section) ? psync_bool_true : psync_bool_false;
 }
