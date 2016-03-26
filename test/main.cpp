@@ -37,8 +37,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <stdlib.h>
 
-static volatile int test_thread_counter /* = 0 */;
-
 static void test_mutex(void);
 static void test_mutex_cxx(void);
 static void test_semaphore(void);
@@ -82,6 +80,11 @@ void test_mutex_cxx(void)
 
 	res = mutex2.Try();
 	assert(res);
+
+	{
+		psyncMutexAuto mutex3(mutex1);
+		assert(mutex3.IsObtained());
+	}
 
 	mutex2.Release();
 
@@ -136,13 +139,14 @@ static void test_thread(void)
 {
 	psync_thread_t thread;
 	void * return_value;
+	volatile int test_thread_counter;
 
 	printf("testing thread\n");
 
+	test_thread_counter = 0;
 	thread = psync_thread_create(test_thread_entry, (void *)&test_thread_counter, PSYNC_THREAD_PRIORITY_DEFAULT, PSYNC_THREAD_STACK_SIZE_DEFAULT, "test_thread");
 	assert(thread);
 
-	test_thread_counter = 0;
 	psync_thread_join(thread, &return_value);
 	assert(test_thread_counter == 1);
 	assert(return_value == (void *)&test_thread_counter);
@@ -152,11 +156,11 @@ static void test_thread_cxx(void)
 {
 	printf("testing thread c++\n");
 
+	volatile int test_thread_counter = 0;
 	psyncThread thread(test_thread_entry, (void *)&test_thread_counter, PSYNC_THREAD_PRIORITY_DEFAULT, PSYNC_THREAD_STACK_SIZE_DEFAULT, "test_thread");
 	assert(thread.IsValid());
 
 	void * return_value;
-	test_thread_counter = 0;
 	thread.Join(&return_value);
 	assert(test_thread_counter == 1);
 	assert(return_value == (void *)&test_thread_counter);
@@ -164,8 +168,10 @@ static void test_thread_cxx(void)
 
 static void * test_thread_entry(void * user_data)
 {
+	int * test_thread_counter = (int *)user_data;
+
 	printf(" inside test_thread_entry\n");
-	++test_thread_counter;
+	++(*test_thread_counter);
 
 	printf(" sleeping for 2 seconds\n");
 	psync_thread_sleep(2 * 1000 * 1000);

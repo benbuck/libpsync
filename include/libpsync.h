@@ -87,7 +87,7 @@ void psync_thread_exit(void * return_value);
 void psync_thread_sleep(unsigned int microseconds);
 
 #ifdef __cplusplus
-}
+} /* end extern "C" */
 
 /** C++ wrappers **/
 
@@ -97,6 +97,8 @@ void psync_thread_sleep(unsigned int microseconds);
 
 class psyncMutex
 {
+	friend class psyncMutexAuto;
+
 public:
 	psyncMutex(void) :
 		mMutex(psync_mutex_create()),
@@ -125,34 +127,54 @@ public:
 
 	bool Obtain(void)
 	{
-		if (mMutex == NULL)
-		{
-			return false;
-		}
 		return psync_mutex_obtain(mMutex) == psync_bool_true;
 	}
 
 	void Release(void)
 	{
-		if (mMutex == NULL)
-		{
-			return;
-		}
 		psync_mutex_release(mMutex);
 	}
 
 	bool Try(void)
 	{
-		if (mMutex == NULL)
-		{
-			return false;
-		}
 		return psync_mutex_try(mMutex) == psync_bool_true;
 	}
 
 protected:
 	psync_mutex_t mMutex;
 	bool mOwner;
+};
+
+/** Mutex **/
+
+class psyncMutexAuto
+{
+public:
+	psyncMutexAuto(psyncMutex & mutex) :
+		mMutex(mutex.mMutex),
+		mObtained(psync_mutex_obtain(mMutex) == psync_bool_true)
+	{
+	}
+
+	~psyncMutexAuto(void)
+	{
+		if (mObtained)
+		{
+			psync_mutex_release(mMutex);
+		}
+	}
+
+	bool IsObtained(void) const
+	{
+		return mObtained;
+	}
+
+protected:
+	// default construction not allowed
+	psyncMutexAuto(void) : mMutex(NULL), mObtained(false) { }
+
+	psync_mutex_t mMutex;
+	bool mObtained;
 };
 
 /** Semaphore **/
@@ -187,28 +209,16 @@ public:
 
 	bool Signal(void)
 	{
-		if (mSemaphore == NULL)
-		{
-			return false;
-		}
 		return psync_semaphore_signal(mSemaphore) == psync_bool_true;
 	}
 
 	bool Wait(void)
 	{
-		if (mSemaphore == NULL)
-		{
-			return false;
-		}
 		return psync_semaphore_wait(mSemaphore) == psync_bool_true;
 	}
 
 	bool Try(void)
 	{
-		if (mSemaphore == NULL)
-		{
-			return false;
-		}
 		return psync_semaphore_try(mSemaphore) == psync_bool_true;
 	}
 
@@ -242,10 +252,6 @@ public:
 
 	void Join(void ** return_value)
 	{
-		if (mThread == NULL)
-		{
-			return;
-		}
 		psync_thread_join(mThread, return_value);
 	}
 

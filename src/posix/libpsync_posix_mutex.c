@@ -48,7 +48,19 @@ psync_mutex_t psync_mutex_create(void)
 	pthread_mutex_t pthread_mutex;
 	psync_mutex_t mutex;
 
-	pthread_mutexattr_init(&attr);
+	res = pthread_mutexattr_init(&attr);
+	if (res != 0)
+	{
+		return NULL;
+	}
+
+	res = pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+	if (res != 0)
+	{
+		pthread_mutexattr_destroy(&attr);
+		return NULL;
+	}
+
 	// FIX - set attr name
 	res = pthread_mutex_init(&pthread_mutex, &attr);
 	pthread_mutexattr_destroy(&attr);

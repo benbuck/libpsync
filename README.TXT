@@ -26,12 +26,16 @@ To Do
 Revision History
 ----------------
 
-0.3 (2007-09-23)
+0.3 (2007-09-24)
+* Fixed bug in threading test.
+* Fixed POSIX mutex to allow recursion.
+* Removed redundant null pointer checks in C++ wrappers.
+* Added psyncMutexAuto class.
 
+0.2 (2007-09-23)
 * Added C++ wrappers for threads, mutexes, and semaphores.
 
 0.1 (2007-09-21)
-
 * Contains very basic APIs for creating threads, mutexes, and semaphores.
 * Has implementations for Win32, POSIX, and PS3 (PS3 version available only
   to registered PS3 developers).
